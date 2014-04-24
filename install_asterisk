@@ -1,0 +1,210 @@
+#!/bin/bash
+
+while :
+do
+    clear
+    cat<<EOF
+    ===================================
+    Installation d'Asterisk et Add-ons
+    -----------------------------------
+    Please enter your choice:
+
+	(1) Premiere installation
+		> iptables, sshguard, asterisk
+	(2) Reinstallation d'asterisk
+		> back-up de la configuration & reinstallation
+	(3) Edition du fichier users.conf
+		> fichier des utilisateurs d'asterisk
+	(4) Edition du fichier extensions.conf
+		> fichier du dialplan d'asterisk	
+    
+	(Q)uitter
+    ------------------------------
+	
+EOF
+    
+	read -n1 -s
+    case "$REPLY" in
+    
+	# Premiere installation
+	"1")  
+		
+		# iptables
+		echo -e "\033[34m===================================\033[0m"
+		echo "Mise a jour de la liste des regles iptables"
+		echo -e "\033[34m===================================\033[0m"
+		sleep 2
+		# Flush out the existing rules
+		iptables -F
+		# Allow localhost loopback interface
+		iptables -A INPUT -i lo -j ACCEPT
+		# Allow already established connections
+		iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+		# Allow icmp
+		iptables -A INPUT -p icmp -j ACCEPT
+		iptables -A OUTPUT -p icmp -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
+		# Allow FreePBX administration from user's PC
+		iptables -A INPUT -p tcp --dport www -j ACCEPT
+		# Allow SIP from the SIP trunk and user's PC
+		iptables -A INPUT -p tcp --dport 5060 -j ACCEPT
+		# Allow voice streaming for user
+		iptables -A INPUT -p udp --dport 10000:20000 -j ACCEPT
+		#Allow SSH an WebMin
+		iptables -A INPUT -p tcp --dport ssh -j ACCEPT
+		iptables -A INPUT -p tcp --dport webmin -j ACCEPT
+		# Set default policies
+		iptables -P INPUT DROP
+		iptables -P FORWARD DROP
+		iptables -P OUTPUT ACCEPT
+		echo "Installation d'iptables : done !"
+		sleep 2
+
+		# Installation d' iptables-persistent et sauvegarde des regles
+		echo -e "\033[34m===================================\033[0m"
+		echo "Installation d'iptables-persistent"
+		echo -e "\033[34m===================================\033[0m"
+		sleep 2
+		apt-get install -y iptables-persistent
+		iptables-save > /etc/iptables/rules.v4
+		echo "Sauvegarde des regles iptables : done !"
+		sleep 2
+
+		# Mise a jour du systeme et installation
+		echo -e "\033[34m===================================\033[0m"
+		echo "Mise a jour du systeme et installation d'Asterisk"
+		echo -e "\033[34m===================================\033[0m"
+		sleep 2
+		apt-get update && apt-get -y upgrade
+		apt-get install -y build-essential libxml2-dev libncurses5-dev libsqlite3-dev libssl-dev
+		mkdir /usr/src/asterisk
+		cd /usr/src/asterisk
+		wget http://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk-12.1.1.tar.gz
+		tar xvzf asterisk-12.1.1.tar.gz
+		cd asterisk-12.1.1
+		contrib/scripts/install_prereq install
+		./configure
+		make menuselect.makeopts
+		menuselect/menuselect --enable CORE-SOUNDS-FR-ULAW --enable MOH-OPSOUND-ULAW --enable EXTRA-SOUNDS-FR-ULAW menuselect.makeopts
+		make
+		make install
+		make samples
+		make config
+		
+		# Sons en fr
+		echo "Mise en place des sons en francais."
+		sed -i -e "s/\;language=en/language=fr /g" /etc/asterisk/sip.conf
+		echo "Installation d'asterisk : done !"
+		sleep 2
+		
+		#users.conf & extensions.conf
+		cp /etc/asterisk/users.conf /etc/asterisk/users.conf.bak
+		cp users_conf /etc/asterisk/users.conf
+		cp /etc/asterisk/extensions.conf /etc/asterisk/extensions.conf.bak
+		cp extensions_conf /etc/asterisk/extensions.conf	
+			
+		/etc/init.d/asterisk start
+
+		# Installation de sshguard
+		echo -e "\033[34m===================================\033[0m"
+		echo "Installation de SSHGuard"
+		echo -e "\033[34m===================================\033[0m"
+		apt-get install -y sshguard
+		echo "Installation de SSHGuard : done !"
+		sleep 2
+
+		# Nettoyage du systeme
+		echo -e "\033[34m===================================\033[0m"
+		echo "Nettoyage et fin du script"
+		echo -e "\033[34m===================================\033[0m"
+		apt-get -V autoclean
+		apt-get -V autoremove
+		echo "OK - Installations terminées !"
+	;;
+	
+	# Sauvegarde de la config et reinstallation
+    "2")  
+		
+		/etc/init.d/asterisk stop
+		
+		# Sauvegarde des conf
+		echo -e "\033[34m===================================\033[0m"
+		echo "Sauvegarde des fichiers dans /tmp/bkast/"
+		echo -e "\033[34m===================================\033[0m"
+		sleep 2
+		mkdir /tmp/bkast/
+		cp /etc/asterisk/sip.conf /tmp/bkast/sip.conf
+		cp /etc/asterisk/users.conf /tmp/bkast/users.conf
+		cp /etc/asterisk/extensions.conf /tmp/bkast/extensions.conf
+		sleep 2
+		
+		# Mise a jour du systeme et reinstallation
+		echo -e "\033[34m===================================\033[0m"
+		echo "Mise a jour du systeme et reinstallation d'Asterisk"
+		echo -e "\033[34m===================================\033[0m"
+		sleep 2
+		apt-get update && apt-get -y upgrade
+		apt-get --reinstall install -y build-essential libxml2-dev libncurses5-dev libsqlite3-dev libssl-dev
+		cd /usr/src/asterisk
+		wget http://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk-12.1.1.tar.gz
+		tar xvzf asterisk-12.1.1.tar.gz
+		cd asterisk-12.1.1
+		contrib/scripts/install_prereq install
+		./configure
+		make menuselect.makeopts
+		menuselect/menuselect --enable CORE-SOUNDS-FR-ULAW --enable MOH-OPSOUND-ULAW --enable EXTRA-SOUNDS-FR-ULAW menuselect.makeopts
+		make
+		make install
+		make samples
+		make config
+		echo "Reconfiguration d'asterisk : done !"
+		sleep 2
+		
+		# Injection des conf
+		echo -e "\033[34m===================================\033[0m"
+		echo "Reinstallation des fichiers de conf"
+		echo -e "\033[34m===================================\033[0m"
+		sleep 2
+		cp /tmp/bkast/sip.conf /etc/asterisk/sip.conf
+		cp /tmp/bkast/users.conf /etc/asterisk/users.conf
+		cp /tmp/bkast/extensions.conf /etc/asterisk/extensions.conf
+		
+		/etc/init.d/asterisk start
+		
+		echo "Injection des fichiers de conf : done !"
+		echo "Les fichiers de back-up se trouvent dans /tmp/bkast/"
+		sleep 2
+
+	;;
+	
+	# Modification users.conf
+    "3")
+		
+		if [ -f /etc/asterisk/users.conf ]; then
+			nano /etc/asterisk/users.conf
+		else
+			echo "Ce fichier n'est pas present."
+			echo "Choisir l'option 1 pour une premiere installation,"
+			echo "l'option 2 pour une reparation de l'installation"
+		fi
+	
+	;;
+	
+	# Modification extensions.conf
+    "4")
+		
+		if [ -f /etc/asterisk/extensions.conf ]; then
+			nano /etc/asterisk/extensions.conf
+		else
+			echo "Ce fichier n'est pas present."
+			echo "Choisir l'option 1 pour une premiere installation,"
+			echo "l'option 2 pour une reparation de l'installation"
+		fi
+	
+	;;
+	
+    "Q")  exit                      ;;
+    "q")  echo "Ne vouliez-vous pas dire "Q" ?"   ;; 
+     * )  echo "Option invalide !"     ;;
+    esac
+    sleep 1
+done
