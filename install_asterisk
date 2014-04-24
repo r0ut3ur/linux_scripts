@@ -124,7 +124,7 @@ EOF
 	# Sauvegarde de la config et reinstallation
     "2")  
 		
-		if [ -f /etc/asterisk ]; then
+		if [ -d /etc/asterisk ]; then
 		
 			/etc/init.d/asterisk stop
 			
