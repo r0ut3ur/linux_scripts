@@ -1,5 +1,10 @@
 #!/bin/bash
 
+dir_install_asterisk = /usr/src/asterisk
+dir_asterisk = /etc/asterisk
+param_config_asterisk = '--enable CORE-SOUNDS-FR-ULAW --enable MOH-OPSOUND-ULAW --enable EXTRA-SOUNDS-FR-ULAW'
+dir_backup = /tmp/bkasterisk/
+
 while :
 do
     clear
@@ -22,11 +27,6 @@ do
     ------------------------------
 	
 EOF
-    
-	dir_install_asterisk = /usr/src/asterisk
-	dir_asterisk = /etc/asterisk
-	param_config_asterisk = '--enable CORE-SOUNDS-FR-ULAW --enable MOH-OPSOUND-ULAW --enable EXTRA-SOUNDS-FR-ULAW'
-	dir_backup = /tmp/bkasterisk/
 	
 	read -n1 -s
     case "$REPLY" in
