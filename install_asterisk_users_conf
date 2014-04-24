@@ -1,0 +1,29 @@
+[general]
+hasvoicemail = yes
+hassip = yes
+hasiax = yes
+callwaiting = yes
+threewaycalling = yes
+callwaitingcallerid = yes
+transfer = yes
+canpark = yes
+cancallforward = yes
+callreturn = yes
+callgroup = 1
+pickupgroup = 1
+nat = yes
+ 
+[template](!)
+type = friend				; Type d’objet SIP, friend = utilisateur
+host = dynamic				;  Vous pouvez vous connecter a ce compte SIP a partir de n’importe quelle adresse IP
+dtmfmode = rfc2833
+disallow = all				; Désactivation de tous les codecs ...
+allow = ulaw				; ... Activation du codec µlaw
+context = work				; Contexte (cf extensions.conf)
+ 
+;[6001](template)			; Numéro SIP
+;fullname = John DOE		; Prénom et NOM de l’utilisateur (ce qui sera afficher sur le téléphone lors d’un appel)
+;username = jdoe			; Nom d’utilisateur
+;secret=secret				; Mot de passe du compte SIP
+
+; Fichier sample : /etc/asterisk/users.conf.bak
