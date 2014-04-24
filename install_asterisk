@@ -119,6 +119,8 @@ EOF
 		apt-get -V autoclean
 		apt-get -V autoremove
 		echo "OK - Installations terminées !"
+		read
+		
 	;;
 	
 	# Sauvegarde de la config et reinstallation
@@ -174,10 +176,10 @@ EOF
 			
 			echo "Injection des fichiers de conf : done !"
 			echo "Les fichiers de back-up se trouvent dans /tmp/bkast/"
-			sleep 2
+			read
 		
 		else
-			echo "Asterisk ne semple pas installe"
+			echo "Asterisk ne semble pas installe"
 			echo "Choisir l'option 1 pour une premiere installation."
 			read
 		fi
@@ -193,7 +195,7 @@ EOF
 			echo "Ce fichier n'est pas present."
 			echo "Choisir l'option 1 pour une premiere installation,"
 			echo "l'option 2 pour une reparation de l'installation"
-			sleep 5
+			read
 		fi
 	
 	;;
@@ -207,7 +209,7 @@ EOF
 			echo "Ce fichier n'est pas present."
 			echo "Choisir l'option 1 pour une premiere installation,"
 			echo "l'option 2 pour une reparation de l'installation"
-			sleep 5
+			read
 		fi
 	
 	;;
