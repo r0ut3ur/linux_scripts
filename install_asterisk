@@ -1,9 +1,9 @@
 #!/bin/bash
 
-dir_install_asterisk = /usr/src/asterisk
-dir_asterisk = /etc/asterisk
-param_config_asterisk = '--enable CORE-SOUNDS-FR-ULAW --enable MOH-OPSOUND-ULAW --enable EXTRA-SOUNDS-FR-ULAW'
-dir_backup = /tmp/bkasterisk/
+dir_install_asterisk=/usr/src/asterisk
+dir_asterisk=/etc/asterisk
+param_config_asterisk='--enable CORE-SOUNDS-FR-ULAW --enable MOH-OPSOUND-ULAW --enable EXTRA-SOUNDS-FR-ULAW'
+dir_backup=/tmp/bkasterisk
 
 while :
 do
@@ -89,6 +89,7 @@ EOF
 		contrib/scripts/install_prereq install
 		./configure
 		make menuselect.makeopts
+	
 		menuselect/menuselect $param_config_asterisk menuselect.makeopts
 		make
 		make install
@@ -97,7 +98,7 @@ EOF
 		
 		# Sons en fr
 		echo "Mise en place des sons en francais."
-		sed -i -e "s/\;language=en/language=fr /g" $dir_asterisk/sip.conf
+		sed -i -e "s/\;language=en/language=fr /g" '$dir_asterisk/sip.conf'
 		echo "Installation d'asterisk : done !"
 		sleep 2
 		
@@ -124,7 +125,7 @@ EOF
 		apt-get autoclean -y
 		apt-get autoremove -y
 		echo "OK - Installations terminées !"
-		read3
+		read
 		
 	;;
 	
@@ -137,7 +138,7 @@ EOF
 			
 			# Sauvegarde des conf
 			echo -e "\033[34m===================================\033[0m"
-			echo "Sauvegarde des fichiers dans /tmp/bkast/"
+			echo "Sauvegarde des fichiers dans $dir_backup"
 			echo -e "\033[34m===================================\033[0m"
 			sleep 2
 			mkdir $dir_backup
