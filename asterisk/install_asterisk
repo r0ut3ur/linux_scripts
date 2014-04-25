@@ -12,7 +12,7 @@ do
     ===================================
     Installation d'Asterisk et Add-ons
     -----------------------------------
-    Please enter your choice:
+    Merci de faire votre choix :
 
 	(1) Premiere installation
 		> iptables, sshguard, asterisk
@@ -21,7 +21,11 @@ do
 	(3) Edition du fichier users.conf
 		> fichier des utilisateurs d'asterisk
 	(4) Edition du fichier extensions.conf
-		> fichier du dialplan d'asterisk	
+		> fichier du dialplan d'asterisk
+	(5) Edition du fichier voicemail.conf
+		> fichier de gestion des boites vocales
+	(6) Edition du fichier rtp.conf
+		> pour y modifier les ports ouverts
     
 	(Q)uitter
     ------------------------------
@@ -35,34 +39,34 @@ EOF
 	"1")  
 		
 		# iptables
-		#echo -e "\033[34m===================================\033[0m"
-		#echo "Mise a jour de la liste des regles iptables"
-		#echo -e "\033[34m===================================\033[0m"
-		#sleep 2
+		echo -e "\033[34m===================================\033[0m"
+		echo "Mise a jour de la liste des regles iptables"
+		echo -e "\033[34m===================================\033[0m"
+		sleep 2
 		# Flush out the existing rules
-		#iptables -F
+		iptables -F
 		# Allow localhost loopback interface
-		#iptables -A INPUT -i lo -j ACCEPT
+		iptables -A INPUT -i lo -j ACCEPT
 		# Allow already established connections
-		#iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+		iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 		# Allow icmp
-		#iptables -A INPUT -p icmp -j ACCEPT
-		#iptables -A OUTPUT -p icmp -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
+		iptables -A INPUT -p icmp -j ACCEPT
+		iptables -A OUTPUT -p icmp -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
 		# Allow FreePBX administration from user's PC
-		#iptables -A INPUT -p tcp --dport www -j ACCEPT
+		iptables -A INPUT -p tcp --dport www -j ACCEPT
 		# Allow SIP from the SIP trunk and user's PC
-		#iptables -A INPUT -p tcp --dport 5060 -j ACCEPT
+		iptables -A INPUT -p tcp --dport 5060 -j ACCEPT
+		iptables -A INPUT -p udp --dport 5060 -j ACCEPT
 		# Allow voice streaming for user
-		#iptables -A INPUT -p udp --dport 10000:20000 -j ACCEPT
-		#Allow SSH an WebMin
-		#iptables -A INPUT -p tcp --dport ssh -j ACCEPT
-		#iptables -A INPUT -p tcp --dport webmin -j ACCEPT
+		iptables -A INPUT -p udp --dport 10000:20000 -j ACCEPT
+		#Allow SSH
+		iptables -A INPUT -p tcp --dport ssh -j ACCEPT
 		# Set default policies
-		#iptables -P INPUT DROP
-		#iptables -P FORWARD DROP
-		#iptables -P OUTPUT ACCEPT
-		#echo "Installation d'iptables : done !"
-		#sleep 2
+		iptables -P INPUT DROP
+		iptables -P FORWARD DROP
+		iptables -P OUTPUT ACCEPT
+		echo "Installation d'iptables : done !"
+		sleep 2
 
 		# Installation d' iptables-persistent et sauvegarde des regles
 		echo -e "\033[34m===================================\033[0m"
@@ -98,17 +102,24 @@ EOF
 		# Sons en fr
 		echo "Mise en place des sons en francais."
 		sed -i -e "s/\;language=en/language=fr /g" $dir_asterisk/sip.conf
-		echo "Installation d'asterisk : done !"
 		sleep 2
 		
 		#users.conf & extensions.conf
+		echo "Mise en place des fichiers de configurations."
 		cd /tmp
 		cp $dir_asterisk/users.conf $dir_asterisk/users.conf.bak
 		cp $1 $dir_asterisk/users.conf
 		cp $dir_asterisk/extensions.conf $dir_asterisk/extensions.conf.bak
 		cp $2 $dir_asterisk/extensions.conf	
+		cp $dir_asterisk/voicemail.conf $dir_asterisk/voicemail.conf.bak
+		cp $3 $dir_asterisk/voicemail.conf
+		cp $dir_asterisk/rtp.conf $dir_asterisk/rtp.conf.bak
+		cp $3 $dir_asterisk/rtp.conf
+		sleep 2
 			
 		/etc/init.d/asterisk start
+		echo "Installation d'asterisk : done !"
+		sleep 5
 
 		# Installation de sshguard
 		echo -e "\033[34m===================================\033[0m"
@@ -145,6 +156,8 @@ EOF
 			cp $dir_asterisk/sip.conf $dir_backup/sip.conf
 			cp $dir_asterisk/users.conf $dir_backup/users.conf
 			cp $dir_asterisk/extensions.conf $dir_backup/extensions.conf
+			cp $dir_asterisk/voicemail.conf $dir_backup/voicemail.conf
+			cp $dir_asterisk/rtp.conf $dir_backup/rtp.conf
 			sleep 2
 			
 			# Mise a jour du systeme et reinstallation
@@ -177,8 +190,12 @@ EOF
 			cp $dir_backup/sip.conf $dir_asterisk/sip.conf
 			cp $dir_backup/users.conf $dir_asterisk/users.conf
 			cp $dir_backup/extensions.conf $dir_asterisk/extensions.conf
+			cp $dir_backup/voicemail.conf $dir_asterisk/voicemail.conf
+			cp $dir_backup/rtp.conf $dir_asterisk/rtp.conf
 			
 			/etc/init.d/asterisk start
+			
+			asterisk -rx "reload"
 			
 			echo "Injection des fichiers de conf : done !"
 			echo "Les fichiers de back-up se trouvent dans $dir_backup"
@@ -197,6 +214,7 @@ EOF
 		
 		if [ -f $dir_asterisk/users.conf ]; then
 			nano $dir_asterisk/users.conf
+			asterisk -rx "reload"
 		else
 			echo "Ce fichier n'est pas present."
 			echo "Choisir l'option 1 pour une premiere installation,"
@@ -211,6 +229,36 @@ EOF
 		
 		if [ -f $dir_asterisk/extensions.conf ]; then
 			nano $dir_asterisk/extensions.conf
+			asterisk -rx "reload"
+		else
+			echo "Ce fichier n'est pas present."
+			echo "Choisir l'option 1 pour une premiere installation,"
+			echo "l'option 2 pour une reparation de l'installation"
+			read
+		fi
+	
+	;;
+	
+	# Modification voicemail.conf
+    "5")
+		
+		if [ -f $dir_asterisk/extensions.conf ]; then
+			nano $dir_asterisk/voicemail.conf
+			asterisk -rx "reload"
+		else
+			echo "Ce fichier n'est pas present."
+			echo "Choisir l'option 1 pour une premiere installation,"
+			echo "l'option 2 pour une reparation de l'installation"
+			read
+		fi
+	
+	;;
+	
+	# Modification rtp.conf
+    "6")
+		
+		if [ -f $dir_asterisk/extensions.conf ]; then
+			nano $dir_asterisk/rtp.conf
 		else
 			echo "Ce fichier n'est pas present."
 			echo "Choisir l'option 1 pour une premiere installation,"
