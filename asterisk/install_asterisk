@@ -24,8 +24,6 @@ do
 		> fichier du dialplan d'asterisk
 	(5) Edition du fichier voicemail.conf
 		> fichier de gestion des boites vocales
-	(6) Edition du fichier rtp.conf
-		> pour y modifier les ports ouverts
     
 	(Q)uitter
     ------------------------------
