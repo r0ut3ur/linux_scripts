@@ -113,8 +113,6 @@ EOF
 		cp $2 $dir_asterisk/extensions.conf	
 		cp $dir_asterisk/voicemail.conf $dir_asterisk/voicemail.conf.bak
 		cp $3 $dir_asterisk/voicemail.conf
-		cp $dir_asterisk/rtp.conf $dir_asterisk/rtp.conf.bak
-		cp $3 $dir_asterisk/rtp.conf
 		sleep 2
 			
 		/etc/init.d/asterisk start
@@ -157,7 +155,6 @@ EOF
 			cp $dir_asterisk/users.conf $dir_backup/users.conf
 			cp $dir_asterisk/extensions.conf $dir_backup/extensions.conf
 			cp $dir_asterisk/voicemail.conf $dir_backup/voicemail.conf
-			cp $dir_asterisk/rtp.conf $dir_backup/rtp.conf
 			sleep 2
 			
 			# Mise a jour du systeme et reinstallation
@@ -191,7 +188,6 @@ EOF
 			cp $dir_backup/users.conf $dir_asterisk/users.conf
 			cp $dir_backup/extensions.conf $dir_asterisk/extensions.conf
 			cp $dir_backup/voicemail.conf $dir_asterisk/voicemail.conf
-			cp $dir_backup/rtp.conf $dir_asterisk/rtp.conf
 			
 			/etc/init.d/asterisk start
 			
