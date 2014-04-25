@@ -19,4 +19,9 @@ TRUNKMSD = 1                                   	    ; MSD digits to strip (usual
 
 ;exten => _6XXX,2,Hangup()							; Raccocher si pas de reponse apres 20sec
 
+OU
+
+;exten => _6XXX,2,VoiceMail(${EXTEN}@work)			; On arrive sur la boite vocale de l'utilisateur
+;exten => 600,1,VoiceMailMain(${CALLERID(num)}@work) 	; Numéro de la boite vocale
+
 ; Fichier sample : /etc/asterisk/extensions.conf.bak
