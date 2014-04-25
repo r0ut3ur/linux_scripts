@@ -24,6 +24,6 @@ context = work				; Contexte (cf extensions.conf)
 ;[6001](template)			; Numéro SIP
 ;fullname = John DOE		; Prénom et NOM de l’utilisateur (ce qui sera afficher sur le téléphone lors d’un appel)
 ;username = jdoe			; Nom d’utilisateur
-;secret = secret				; Mot de passe du compte SIP
+;secret = secret			; Mot de passe du compte SIP
 
 ; Fichier sample : /etc/asterisk/users.conf.bak
