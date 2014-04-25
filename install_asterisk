@@ -89,7 +89,6 @@ EOF
 		contrib/scripts/install_prereq install
 		./configure
 		make menuselect.makeopts
-	
 		menuselect/menuselect $param_config_asterisk menuselect.makeopts
 		make
 		make install
@@ -98,11 +97,12 @@ EOF
 		
 		# Sons en fr
 		echo "Mise en place des sons en francais."
-		sed -i -e "s/\;language=en/language=fr /g" '$dir_asterisk/sip.conf'
+		sed -i -e "s/\;language=en/language=fr /g" $dir_asterisk/sip.conf
 		echo "Installation d'asterisk : done !"
 		sleep 2
 		
 		#users.conf & extensions.conf
+		cd /tmp
 		cp $dir_asterisk/users.conf $dir_asterisk/users.conf.bak
 		cp $1 $dir_asterisk/users.conf
 		cp $dir_asterisk/extensions.conf $dir_asterisk/extensions.conf.bak
