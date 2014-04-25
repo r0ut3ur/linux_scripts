@@ -35,34 +35,34 @@ EOF
 	"1")  
 		
 		# iptables
-		echo -e "\033[34m===================================\033[0m"
-		echo "Mise a jour de la liste des regles iptables"
-		echo -e "\033[34m===================================\033[0m"
-		sleep 2
+		#echo -e "\033[34m===================================\033[0m"
+		#echo "Mise a jour de la liste des regles iptables"
+		#echo -e "\033[34m===================================\033[0m"
+		#sleep 2
 		# Flush out the existing rules
-		iptables -F
+		#iptables -F
 		# Allow localhost loopback interface
-		iptables -A INPUT -i lo -j ACCEPT
+		#iptables -A INPUT -i lo -j ACCEPT
 		# Allow already established connections
-		iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+		#iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 		# Allow icmp
-		iptables -A INPUT -p icmp -j ACCEPT
-		iptables -A OUTPUT -p icmp -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
+		#iptables -A INPUT -p icmp -j ACCEPT
+		#iptables -A OUTPUT -p icmp -m conntrack --ctstate NEW,ESTABLISHED,RELATED -j ACCEPT
 		# Allow FreePBX administration from user's PC
-		iptables -A INPUT -p tcp --dport www -j ACCEPT
+		#iptables -A INPUT -p tcp --dport www -j ACCEPT
 		# Allow SIP from the SIP trunk and user's PC
-		iptables -A INPUT -p tcp --dport 5060 -j ACCEPT
+		#iptables -A INPUT -p tcp --dport 5060 -j ACCEPT
 		# Allow voice streaming for user
-		iptables -A INPUT -p udp --dport 10000:20000 -j ACCEPT
+		#iptables -A INPUT -p udp --dport 10000:20000 -j ACCEPT
 		#Allow SSH an WebMin
-		iptables -A INPUT -p tcp --dport ssh -j ACCEPT
-		iptables -A INPUT -p tcp --dport webmin -j ACCEPT
+		#iptables -A INPUT -p tcp --dport ssh -j ACCEPT
+		#iptables -A INPUT -p tcp --dport webmin -j ACCEPT
 		# Set default policies
-		iptables -P INPUT DROP
-		iptables -P FORWARD DROP
-		iptables -P OUTPUT ACCEPT
-		echo "Installation d'iptables : done !"
-		sleep 2
+		#iptables -P INPUT DROP
+		#iptables -P FORWARD DROP
+		#iptables -P OUTPUT ACCEPT
+		#echo "Installation d'iptables : done !"
+		#sleep 2
 
 		# Installation d' iptables-persistent et sauvegarde des regles
 		echo -e "\033[34m===================================\033[0m"
