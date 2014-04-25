@@ -1,3 +1,0 @@
-[general]
-rtpstart=10000         // first port to use
-rtpend=20000           // last port to use, rounded up if odd
