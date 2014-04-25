@@ -1,0 +1,6 @@
+cd /tmp
+wget --no-check-certificate https://raw.githubusercontent.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk
+wget --no-check-certificate https://raw.githubusercontent.com/r0ut3ur/linux_scripts/master/asterisk/asterisk/install_asterisk_extensions_conf
+wget --no-check-certificate https://raw.githubusercontent.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_users_conf
+chmod 700 install_asteriskasterisk/
+./install_asterisk install_asterisk_users_conf install_asterisk_extensions_conf
