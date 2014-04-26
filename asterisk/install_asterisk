@@ -35,7 +35,7 @@ do
 		> fichier du dialplan d'asterisk
 	(5) Edition du fichier voicemail.conf
 		> fichier de gestion des boites vocales
-    (6) Ajout d'un utilisateur
+	(6) Ajout d'un utilisateur
 		
 	(Q)uitter
     ------------------------------
@@ -287,13 +287,13 @@ EOF
 			select CHOIX in "${LISTE[@]}" ; do
 				case $REPLY in
 					1|y)
-						echo ""
 						echo "" | tee -a $dir_asterisk/users.conf
 						echo "[$user](template)" | tee -a $dir_asterisk/users.conf
 						echo "fullname = $nomprenom" | tee -a $dir_asterisk/users.conf
 						echo "username = $user" | tee -a $dir_asterisk/users.conf
 						echo "secret = $pass" | tee -a $dir_asterisk/users.conf
 						echo "Utilisateur enregistré."
+						asterisk -rx "reload"
 						read
 						break
 					;;
