@@ -5,6 +5,17 @@ dir_asterisk=/etc/asterisk
 param_config_asterisk='--enable CORE-SOUNDS-FR-ULAW --enable MOH-OPSOUND-ULAW --enable EXTRA-SOUNDS-FR-ULAW'
 dir_backup=/tmp/bkasterisk
 
+users_base=install_asterisk_users_conf
+ext_base=install_asterisk_extensions_conf
+voice_base=install_asterisk_voicemail_conf
+
+---------------------------------------------------------------------------------------------------------------
+
+cd /tmp
+wget --no-check-certificate https://raw.githubusercontent.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_extensions_conf
+wget --no-check-certificate https://raw.githubusercontent.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_users_conf
+wget --no-check-certificate https://raw.githubusercontent.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_voicemail_conf
+
 while :
 do
     clear
@@ -24,7 +35,8 @@ do
 		> fichier du dialplan d'asterisk
 	(5) Edition du fichier voicemail.conf
 		> fichier de gestion des boites vocales
-    
+    (6) Ajout d'un utilisateur
+		
 	(Q)uitter
     ------------------------------
 	
@@ -106,11 +118,11 @@ EOF
 		echo "Mise en place des fichiers de configurations."
 		cd /tmp
 		cp $dir_asterisk/users.conf $dir_asterisk/users.conf.bak
-		cp $1 $dir_asterisk/users.conf
+		cp $users_base $dir_asterisk/users.conf
 		cp $dir_asterisk/extensions.conf $dir_asterisk/extensions.conf.bak
-		cp $2 $dir_asterisk/extensions.conf	
+		cp $ext_base $dir_asterisk/extensions.conf	
 		cp $dir_asterisk/voicemail.conf $dir_asterisk/voicemail.conf.bak
-		cp $3 $dir_asterisk/voicemail.conf
+		cp $voice_base $dir_asterisk/voicemail.conf
 		sleep 2
 			
 		/etc/init.d/asterisk start
@@ -248,13 +260,54 @@ EOF
 	
 	;;
 	
-	# Modification rtp.conf
+	# Ajout user
     "6")
 		
-		if [ -f $dir_asterisk/extensions.conf ]; then
-			nano $dir_asterisk/rtp.conf
+		if [ -f $dir_asterisk/users.conf ]; then
+			clear 
+			echo ""
+			echo "Quel numero SIP ? (ex: 6001)"
+			read numsip
+			echo "Prenom et NOM ? (ex: John DOE)"
+			read nomprenom
+			echo "Quel username ? (ex: jdoe)"
+			read user
+			echo "Quel mot de passe ?"
+			read pass
+			echo ""
+			echo "Les donnees qui seront enregistrees : "
+			echo ""
+			echo " [$numsip]"
+			echo " fullname = $nomprenom"
+			echo " username = $user"
+			echo " secret = $pass"
+			echo ""
+			PS3='> '
+			LISTE=("[y] Confirmation" "[n] Annulation")
+			select CHOIX in "${LISTE[@]}" ; do
+				case $REPLY in
+					1|y)
+						echo ""
+						echo "" | tee -a $dir_asterisk/users.conf
+						echo "[$user](template)" | tee -a $dir_asterisk/users.conf
+						echo "fullname = $nomprenom" | tee -a $dir_asterisk/users.conf
+						echo "username = $user" | tee -a $dir_asterisk/users.conf
+						echo "secret = $pass" | tee -a $dir_asterisk/users.conf
+						echo "Utilisateur enregistré."
+						read
+						break
+					;;
+					2|n)
+						echo ""
+						echo "Aucune modification n'a ete apportee."
+						read
+						break
+					;;
+				esac
+			done
+						
 		else
-			echo "Ce fichier n'est pas present."
+			echo "Asterisk ne semble pas installe, ou endomage."
 			echo "Choisir l'option 1 pour une premiere installation,"
 			echo "l'option 2 pour une reparation de l'installation"
 			read
