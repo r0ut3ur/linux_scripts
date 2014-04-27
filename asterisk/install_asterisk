@@ -12,8 +12,11 @@ voice_base=install_asterisk_voicemail_conf
 ---------------------------------------------------------------------------------------------------------------
 
 cd /tmp
+rm -f install_asterisk_extensions_conf
 wget --no-check-certificate https://raw.githubusercontent.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_extensions_conf
+rm -f install_asterisk_users_conf
 wget --no-check-certificate https://raw.githubusercontent.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_users_conf
+rm -f install_asterisk_voicemail_conf
 wget --no-check-certificate https://raw.githubusercontent.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_voicemail_conf
 
 while :
@@ -312,7 +315,6 @@ EOF
 				echo "Ce numero SIP existe deja."
 				echo "Aucune modification n'a ete apportee."
 				read
-				break
 			fi	
 						
 		else
