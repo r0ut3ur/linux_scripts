@@ -297,12 +297,14 @@ EOF
 				select CHOIX in "${LISTE[@]}" ; do
 					case $REPLY in
 						1|y)
+							echo ""
 							echo "[$numsip](template)" | tee -a $dir_asterisk/users.conf
 							echo "fullname = $nomprenom" | tee -a $dir_asterisk/users.conf
 							echo "username = $user" | tee -a $dir_asterisk/users.conf
 							echo "secret = $pass" | tee -a $dir_asterisk/users.conf
-							if [$voicemail_on == yes]
+							if [$voicemail_on == "yes"]
 							then
+								echo ""
 								echo "$numsip => $voicemail_pass,$username" | tee -a $dir_asterisk/voicemail.conf;
 							fi
 							echo "Utilisateur enregistré."
