@@ -268,43 +268,52 @@ EOF
 			echo ""
 			echo "Quel numero SIP ? (ex: 6001)"
 			read numsip
-			echo "Prenom et NOM ? (ex: John DOE)"
-			read nomprenom
-			echo "Quel username ? (ex: jdoe)"
-			read user
-			echo "Quel mot de passe ?"
-			read pass
-			echo ""
-			echo "Les donnees qui seront enregistrees : "
-			echo ""
-			echo " [$numsip]"
-			echo " fullname = $nomprenom"
-			echo " username = $user"
-			echo " secret = $pass"
-			echo ""
-			PS3='> '
-			LISTE=("[y] Confirmation" "[n] Annulation")
-			select CHOIX in "${LISTE[@]}" ; do
-				case $REPLY in
-					1|y)
-						echo "" | tee -a $dir_asterisk/users.conf
-						echo "[$user](template)" | tee -a $dir_asterisk/users.conf
-						echo "fullname = $nomprenom" | tee -a $dir_asterisk/users.conf
-						echo "username = $user" | tee -a $dir_asterisk/users.conf
-						echo "secret = $pass" | tee -a $dir_asterisk/users.conf
-						echo "Utilisateur enregistré."
-						asterisk -rx "reload"
-						read
-						break
-					;;
-					2|n)
-						echo ""
-						echo "Aucune modification n'a ete apportee."
-						read
-						break
-					;;
-				esac
-			done
+			grep $numsip $dir_asterisk/users.conf
+			if [ $? == 1 ]
+			then
+				echo "Prenom et NOM ? (ex: John DOE)"
+				read nomprenom
+				echo "Quel username ? (ex: jdoe)"
+				read user
+				echo "Quel mot de passe ?"
+				read pass
+				echo ""
+				echo "Les donnees qui seront enregistrees : "
+				echo ""
+				echo " [$numsip]"
+				echo " fullname = $nomprenom"
+				echo " username = $user"
+				echo " secret = $pass"
+				echo ""
+				PS3='> '
+				LISTE=("[y] Confirmation" "[n] Annulation")
+				select CHOIX in "${LISTE[@]}" ; do
+					case $REPLY in
+						1|y)
+							echo "[$numsip](template)" | tee -a $dir_asterisk/users.conf
+							echo "fullname = $nomprenom" | tee -a $dir_asterisk/users.conf
+							echo "username = $user" | tee -a $dir_asterisk/users.conf
+							echo "secret = $pass" | tee -a $dir_asterisk/users.conf
+							echo "Utilisateur enregistré."
+							asterisk -rx "reload"
+							read
+							break
+						;;
+						2|n)
+							echo ""
+							echo "Aucune modification n'a ete apportee."
+							read
+							break
+						;;
+					esac
+				done
+			else
+				echo ""
+				echo "Ce numero SIP existe deja."
+				echo "Aucune modification n'a ete apportee."
+				read
+				break
+			fi	
 						
 		else
 			echo "Asterisk ne semble pas installe, ou endomage."
