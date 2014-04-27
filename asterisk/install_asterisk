@@ -304,8 +304,9 @@ EOF
 							echo "secret = $pass" | tee -a $dir_asterisk/users.conf
 							if [ $voicemail_on == 'yes' ]
 							then
-								echo ""
-								echo "$numsip => $voicemail_pass,$username" | tee -a $dir_asterisk/voicemail.conf;
+								#echo ""
+								"$numsip => $voicemail_pass,$user" >> $dir_asterisk/voicemail.conf
+								#echo "$numsip => $voicemail_pass,$user" | tee -a $dir_asterisk/voicemail.conf;
 							fi
 							echo "Utilisateur enregistré."
 							asterisk -rx "reload"
