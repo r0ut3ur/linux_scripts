@@ -1,15 +1,19 @@
 #!/bin/bash
 
+# PATH
 dir_install_asterisk=/usr/src/asterisk
 dir_asterisk=/etc/asterisk
-param_config_asterisk='--enable CORE-SOUNDS-FR-ULAW --enable MOH-OPSOUND-ULAW --enable EXTRA-SOUNDS-FR-ULAW'
 dir_backup=/tmp/bkasterisk
 
+# SIP
+param_config_asterisk='--enable CORE-SOUNDS-FR-ULAW --enable MOH-OPSOUND-ULAW --enable EXTRA-SOUNDS-FR-ULAW'
 users_base=install_asterisk_users_conf
 ext_base=install_asterisk_extensions_conf
 voice_base=install_asterisk_voicemail_conf
+voicemail_on=yes
+voicemail_pass=1234
 
----------------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------
 
 cd /tmp
 rm -f install_asterisk_extensions_conf
@@ -272,7 +276,7 @@ EOF
 			echo "Quel numero SIP ? (ex: 6001)"
 			read numsip
 			grep $numsip $dir_asterisk/users.conf
-			if [ $? == 1 ]
+			if [ $? == 1 ] 
 			then
 				echo "Prenom et NOM ? (ex: John DOE)"
 				read nomprenom
@@ -297,6 +301,9 @@ EOF
 							echo "fullname = $nomprenom" | tee -a $dir_asterisk/users.conf
 							echo "username = $user" | tee -a $dir_asterisk/users.conf
 							echo "secret = $pass" | tee -a $dir_asterisk/users.conf
+							if [$voicemail_on == yes]
+							then
+								echo "$numsip => $voicemail_pass,$username" | tee -a $dir_asterisk/voicemail.conf
 							echo "Utilisateur enregistré."
 							asterisk -rx "reload"
 							read
