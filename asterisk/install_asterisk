@@ -17,13 +17,13 @@ voicemail_pass=1234
 
 cd /tmp
 rm -f install_asterisk_extensions_conf
-wget https://raw.github.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_extensions_conf
+wget --no-check-certificate https://raw.github.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_extensions_conf
 rm -f install_asterisk_users_conf
-wget https://raw.github.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_users_conf
+wget --no-check-certificate https://raw.github.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_users_conf
 rm -f install_asterisk_voicemail_conf
-wget https://raw.github.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_voicemail_conf
+wget --no-check-certificate https://raw.github.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_voicemail_conf
 rm -f install_asterisk_iax_conf
-wget https://raw.github.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_iax_conf
+wget --no-check-certificate https://raw.github.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_iax_conf
 
 while :
 do
