@@ -3,7 +3,7 @@
 # PATH
 dir_install_asterisk=/usr/src/asterisk
 dir_asterisk=/etc/asterisk
-dir_backup=/tmp/bkasterisk
+dir_backup=/etc/asterisk/bkasterisk
 
 # SIP
 param_config_asterisk='--enable CORE-SOUNDS-FR-ULAW --enable MOH-OPSOUND-ULAW --enable EXTRA-SOUNDS-FR-ULAW'
@@ -17,11 +17,11 @@ voicemail_pass=1234
 
 cd /tmp
 rm -f install_asterisk_extensions_conf
-wget --no-check-certificate https://raw.githubusercontent.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_extensions_conf
+wget https://raw.github.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_extensions_conf
 rm -f install_asterisk_users_conf
-wget --no-check-certificate https://raw.githubusercontent.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_users_conf
+wget https://raw.github.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_users_conf
 rm -f install_asterisk_voicemail_conf
-wget --no-check-certificate https://raw.githubusercontent.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_voicemail_conf
+wget https://raw.github.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_voicemail_conf
 
 while :
 do
@@ -55,16 +55,16 @@ EOF
 	# Premiere installation
 	"1")  
 		
-		ping -c 3 8.8.8.8
-		if [ $?!=0 ]; then
+		ping -c3 8.8.8.8
+		test_ping=$?
+		if [ $test_ping -ne 0 ]
+		then
 			echo "La connection vers Internet ne semble pas active."
 			echo "Merci de verifier son bon fonctionnement avant de continuer."
 			read -p "Merci d'appuyer sur une touche ..." -n1
 		else
 			# iptables
-			echo -e "\033[34m===================================\033[0m"
 			echo "Mise a jour de la liste des regles iptables"
-			echo -e "\033[34m===================================\033[0m"
 			sleep 2
 			# Flush out the existing rules
 			iptables -F
@@ -80,6 +80,7 @@ EOF
 			# Allow SIP from the SIP trunk and user's PC
 			iptables -A INPUT -p tcp --dport 5060 -j ACCEPT
 			iptables -A INPUT -p udp --dport 5060 -j ACCEPT
+			iptables -A INPUT -p udp --dport 4569 -j ACCEPT
 			# Allow voice streaming for user
 			iptables -A INPUT -p udp --dport 10000:20000 -j ACCEPT
 			#Allow SSH
@@ -92,9 +93,7 @@ EOF
 			sleep 2
 
 			# Installation d' iptables-persistent et sauvegarde des regles
-			echo -e "\033[34m===================================\033[0m"
 			echo "Installation d'iptables-persistent"
-			echo -e "\033[34m===================================\033[0m"
 			sleep 2
 			apt-get install -y iptables-persistent
 			iptables-save > /etc/iptables/rules.v4
@@ -102,9 +101,7 @@ EOF
 			sleep 2
 
 			# Mise a jour du systeme et installation
-			echo -e "\033[34m===================================\033[0m"
 			echo "Mise a jour du systeme et installation d'Asterisk"
-			echo -e "\033[34m===================================\033[0m"
 			sleep 2
 			apt-get update && apt-get -y upgrade
 			apt-get install -y build-essential libxml2-dev libncurses5-dev libsqlite3-dev libssl-dev
@@ -136,97 +133,103 @@ EOF
 			cp $ext_base $dir_asterisk/extensions.conf	
 			cp $dir_asterisk/voicemail.conf $dir_asterisk/voicemail.conf.bak
 			cp $voice_base $dir_asterisk/voicemail.conf
+			cp $dir_asterisk/iax.conf $dir_asterisk/iax.conf.bak
+			cp $voice_base $dir_asterisk/iax.conf
 			sleep 2
 				
 			/etc/init.d/asterisk start
 			echo "Installation d'asterisk : done !"
 			sleep 5
+			
+			# Installation de Google TTS
+			echo "Installation de google TTS"
+			sleep 2
+			cd /var/lib/asterisk/agi-bin
+			wget https://raw.github.com/zaf/asterisk-googletts/master/googletts.agi
+			chmod +x googletts.agi
 
 			# Installation de sshguard
-			echo -e "\033[34m===================================\033[0m"
 			echo "Installation de SSHGuard"
-			echo -e "\033[34m===================================\033[0m"
 			apt-get install -y sshguard
 			echo "Installation de SSHGuard : done !"
 			sleep 2
 
 			# Nettoyage du systeme
-			echo -e "\033[34m===================================\033[0m"
 			echo "Nettoyage et fin du script"
-			echo -e "\033[34m===================================\033[0m"
 			apt-get autoclean -y
 			apt-get autoremove -y
 			echo "OK - Installations terminées !"
 			read -p "Merci d'appuyer sur une touche ..." -n1
 		fi
-		
-		
-		
+
 	;;
 	
 	# Sauvegarde de la config et reinstallation
     "2")  
 		
-		if [ -d /etc/asterisk ]; then
-		
-			/etc/init.d/asterisk stop
-			
-			# Sauvegarde des conf
-			echo -e "\033[34m===================================\033[0m"
-			echo "Sauvegarde des fichiers dans $dir_backup"
-			echo -e "\033[34m===================================\033[0m"
-			sleep 2
-			mkdir $dir_backup
-			cp $dir_asterisk/sip.conf $dir_backup/sip.conf
-			cp $dir_asterisk/users.conf $dir_backup/users.conf
-			cp $dir_asterisk/extensions.conf $dir_backup/extensions.conf
-			cp $dir_asterisk/voicemail.conf $dir_backup/voicemail.conf
-			sleep 2
-			
-			# Mise a jour du systeme et reinstallation
-			echo -e "\033[34m===================================\033[0m"
-			echo "Mise a jour du systeme et reinstallation d'Asterisk"
-			echo -e "\033[34m===================================\033[0m"
-			sleep 2
-			apt-get update && apt-get -y upgrade
-			apt-get --reinstall install -y build-essential libxml2-dev libncurses5-dev libsqlite3-dev libssl-dev
-			cd $dir_install_asterisk
-			wget http://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk-12.1.1.tar.gz
-			tar xvzf asterisk-12.1.1.tar.gz
-			cd asterisk-12.1.1
-			contrib/scripts/install_prereq install
-			./configure
-			make menuselect.makeopts
-			menuselect/menuselect $param_config_asterisk menuselect.makeopts
-			make
-			make install
-			make samples
-			make config
-			echo "Reconfiguration d'asterisk : done !"
-			sleep 2
-			
-			# Injection des conf
-			echo -e "\033[34m===================================\033[0m"
-			echo "Reinstallation des fichiers de conf"
-			echo -e "\033[34m===================================\033[0m"
-			sleep 2
-			cp $dir_backup/sip.conf $dir_asterisk/sip.conf
-			cp $dir_backup/users.conf $dir_asterisk/users.conf
-			cp $dir_backup/extensions.conf $dir_asterisk/extensions.conf
-			cp $dir_backup/voicemail.conf $dir_asterisk/voicemail.conf
-			
-			/etc/init.d/asterisk start
-			
-			asterisk -rx "reload"
-			
-			echo "Injection des fichiers de conf : done !"
-			echo "Les fichiers de back-up se trouvent dans $dir_backup"
+		ping -c3 8.8.8.8
+		test_ping=$?
+		if [ $test_ping -ne 0 ]
+		then
+			echo "La connection vers Internet ne semble pas active."
+			echo "Merci de verifier son bon fonctionnement avant de continuer."
 			read -p "Merci d'appuyer sur une touche ..." -n1
-		
 		else
-			echo "Asterisk ne semble pas installe"
-			echo "Choisir l'option 1 pour une premiere installation."
-			read -p "Merci d'appuyer sur une touche ..." -n1
+			if [ -d /etc/asterisk ]; then
+				/etc/init.d/asterisk stop
+				
+				# Sauvegarde des conf
+				echo "Sauvegarde des fichiers dans $dir_backup"
+				sleep 2
+				mkdir $dir_backup
+				cp $dir_asterisk/sip.conf $dir_backup/sip.conf
+				cp $dir_asterisk/users.conf $dir_backup/users.conf
+				cp $dir_asterisk/extensions.conf $dir_backup/extensions.conf
+				cp $dir_asterisk/voicemail.conf $dir_backup/voicemail.conf
+				cp $dir_asterisk/iax.conf $dir_backup/iax.conf
+				sleep 2
+				
+				# Mise a jour du systeme et reinstallation
+				echo "Mise a jour du systeme et reinstallation d'Asterisk"
+				sleep 2
+				apt-get update && apt-get -y upgrade
+				apt-get --reinstall install -y build-essential libxml2-dev libncurses5-dev libsqlite3-dev libssl-dev
+				cd $dir_install_asterisk
+				wget http://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk-12.1.1.tar.gz
+				tar xvzf asterisk-12.1.1.tar.gz
+				cd asterisk-12.1.1
+				contrib/scripts/install_prereq install
+				./configure
+				make menuselect.makeopts
+				menuselect/menuselect $param_config_asterisk menuselect.makeopts
+				make
+				make install
+				make samples
+				make config
+				echo "Reconfiguration d'asterisk : done !"
+				sleep 2
+				
+				# Injection des conf
+				echo "Reinstallation des fichiers de conf"
+				sleep 2
+				cp $dir_backup/sip.conf $dir_asterisk/sip.conf
+				cp $dir_backup/users.conf $dir_asterisk/users.conf
+				cp $dir_backup/extensions.conf $dir_asterisk/extensions.conf
+				cp $dir_backup/voicemail.conf $dir_asterisk/voicemail.conf
+				
+				/etc/init.d/asterisk start
+				
+				asterisk -rx "reload"
+				
+				echo "Injection des fichiers de conf : done !"
+				echo "Les fichiers de back-up se trouvent dans $dir_backup"
+				read -p "Merci d'appuyer sur une touche ..." -n1
+			
+			else
+				echo "Asterisk ne semble pas installe"
+				echo "Choisir l'option 1 pour une premiere installation."
+				read -p "Merci d'appuyer sur une touche ..." -n1
+			fi
 		fi
 		
 	;;
@@ -307,6 +310,7 @@ EOF
 					case $REPLY in
 						1|y)
 							echo ""
+							echo "" | tee -a $dir_asterisk/users.conf
 							echo "[$numsip](template)" | tee -a $dir_asterisk/users.conf
 							echo "fullname = $nomprenom" | tee -a $dir_asterisk/users.conf
 							echo "username = $user" | tee -a $dir_asterisk/users.conf
