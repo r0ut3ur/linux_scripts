@@ -22,6 +22,8 @@ rm -f install_asterisk_users_conf
 wget https://raw.github.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_users_conf
 rm -f install_asterisk_voicemail_conf
 wget https://raw.github.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_voicemail_conf
+rm -f install_asterisk_iax_conf
+wget https://raw.github.com/r0ut3ur/linux_scripts/master/asterisk/install_asterisk_iax_conf
 
 while :
 do
