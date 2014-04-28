@@ -1,0 +1,15 @@
+;[trunk-Asterisk1]			; Nom du trunk, vers le serveur X
+;type=peer					; Type de compte
+;username=user				; Username du compte auquel le trunck se connecte sur le serveur X
+;secret=123456				; Mot de passe de ce compte sur le serveur X
+;host=37.187.243.94			; Adresse IP du serveur X
+;trunk=yes
+;qualify=yes
+
+; Pour identifier le serveur Y
+;[user]						; Nom de l'utilisateur avec lequel se connectera le serveur Y
+;type=user					; Type de compte
+;secret=123456				; Mot de passe du compte 
+;context=work				; /!\ Contexte identique au extensions.conf
+
+; Fichier sample : /etc/asterisk/iax.conf.bak
