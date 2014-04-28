@@ -44,8 +44,10 @@ do
 		> fichier du dialplan d'asterisk
 	(5) Edition du fichier voicemail.conf
 		> fichier de gestion des boites vocales
-	(6) Ajout d'un utilisateur
-		
+	(6) Edition du fichier iax.conf
+		> fichier de gestion de l'IAX
+	(7) Ajout d'un utilisateur
+
 	(Q)uitter
     ------------------------------
 	
@@ -218,6 +220,7 @@ EOF
 				cp $dir_backup/users.conf $dir_asterisk/users.conf
 				cp $dir_backup/extensions.conf $dir_asterisk/extensions.conf
 				cp $dir_backup/voicemail.conf $dir_asterisk/voicemail.conf
+				cp $dir_backup/iax.conf $dir_asterisk/iax.conf
 				
 				/etc/init.d/asterisk start
 				
@@ -281,8 +284,23 @@ EOF
 	
 	;;
 	
-	# Ajout user
+	# Modification iax.conf
     "6")
+		
+		if [ -f $dir_asterisk/iax.conf ]; then
+			nano $dir_asterisk/iax.conf
+			asterisk -rx "reload"
+		else
+			echo "Ce fichier n'est pas present."
+			echo "Choisir l'option 1 pour une premiere installation,"
+			echo "l'option 2 pour une reparation de l'installation"
+			read -p "Merci d'appuyer sur une touche ..." -n1
+		fi
+	
+	;;
+	
+	# Ajout user
+    "7")
 		
 		if [ -f $dir_asterisk/users.conf ]; then
 			clear 
