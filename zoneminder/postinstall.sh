@@ -31,23 +31,24 @@ fi
 # Mise a jour du systeme
 #-----------------------
 
-echo "Mise a jour du systeme"
-
+echo "Mise a jour de la liste des paquets ..."
 # Update
 apt update 2>&1 | grep NO_PUBKEY | perl -pwe 's#^.+NO_PUBKEY (.+)$#$1#' | xargs apt-key adv --recv-keys --keyserver keyserver.ubuntu.com
 
+echo "... et installation des mises a jour."
 # Upgrade
-apt dist-upgrade
+apt -y dist-upgrade 2>&1
 
 # Installations de logiciels
 #---------------------------
 
 echo "Installation des logiciels suivants: $LISTE"
-
 apt -y install $LISTE
 
 # Configuration de LAMP
 #----------------------
+
+echo "Configuration de L.A.M.P ..."
 
 # Remplacement du fichier my.cnf (Suppression des valeurs pré-configurées)
 rm /etc/mysql/my.cnf
